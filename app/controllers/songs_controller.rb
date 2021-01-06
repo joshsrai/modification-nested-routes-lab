@@ -25,8 +25,14 @@ class SongsController < ApplicationController
   end
 
   def new
-    @song = Song.new
+    if params[:artist_id] && !Artist.exists?(params[:artist_id])
+      redirect_to artists_path, alert: "Artist not found."
+    else
+      @song = Song.new(artist_id: params[:artist_id])
+    end
+  # Set up routes and controller actions to support editing a song as a nested resource of an artist.
   end
+
 
   def create
     @song = Song.new(song_params)
@@ -39,7 +45,18 @@ class SongsController < ApplicationController
   end
 
   def edit
-    @song = Song.find(params[:id])
+    if params[:artist_id]
+      artist = Artist.find_by(id: params[:artist_id])
+      if artist.nil?
+        redirect_to artists_path, alert: "Artist not found."
+      else
+        @song = artist.songs.find_by(id: params[:id])
+        redirect_to artist_songs_path(artist), alert: "Song not found." if @song.nil?
+      end
+    else
+      @song = Song.find(params[:id])
+    end
+    # Create a helper to display a drop-down list of artists if someone edits a song directly via /songs/:id/edit and to only display the artist's name if they are editing through nested routing. Name the helper method artist_select. Hint: You'll need to set a variable in the controller action to pass to the helper method as an argument along with a song instance.
   end
 
   def update
@@ -64,7 +81,8 @@ class SongsController < ApplicationController
   private
 
   def song_params
-    params.require(:song).permit(:title, :artist_name)
+    params.require(:song).permit(:title, :artist_name, :artist_id)
+    # Using nested resources, set up routes and controller actions to create new song records through an artist. Hint: Don't forget to update the strong parameters.
   end
 end
 

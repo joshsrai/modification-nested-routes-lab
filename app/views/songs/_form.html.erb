@@ -1,4 +1,6 @@
 <%= form_for @song  do |f| %>
+  <%= artist_select(@song) %>
+  <br> 
   <%= f.label :title %>
   <%= f.text_field :title %><br>
   <%= f.label :artist_name %>
@@ -7,3 +9,7 @@
 
   <%= f.submit %>
 <% end %>
+
+<!--Validate that new songs created for an artist via nested routing are created for valid artists, and redirect to /artists if not. -->
+    
+<!-- Validate that songs being edited via nested routing have a valid artist. Redirect to /artists if not. -->
